@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Checklist Automotivo - CPM (Versão Profissional)</title>
+    
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="logo">C.P.M</div>
+            <div class="subtitle">Consórcio Performance Metropolitana<br>Sistema de Checklist Automotivo</div>
+            
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="observador">Observador/Inspetor:</label>
+                    <input type="text" id="observador" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="supervisor">Supervisor:</label>
+                    <input type="text" id="supervisor" required>
+                </div>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-sign-in-alt"></i> Entrar no Sistema
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="appScreen" class="container" style="display: none;">
+        <div class="app-container">
+            <header class="app-header">
+                <div>
+                    <div class="app-title">
+                        <i class="fas fa-clipboard-check"></i> Checklist de Veículos Utilitários
+                    </div>
+                    <div class="user-info">
+                        <span id="currentUser"></span>
+                        <span id="currentDate"></span>
+                        <span id="currentTime"></span>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sair
+                </button>
+            </header>
+
+            <main class="app-content">
+                <form id="checklistForm">
+                    <section class="section">
+                        <h2 class="section-title"><i class="fas fa-list-check"></i> Tipo de Checklist</h2>
+                        <div class="radio-group">
+                            <label class="radio-item"><input type="radio" name="tipoChecklist" value="chegada" required><span>Chegada</span></label>
+                            <label class="radio-item"><input type="radio" name="tipoChecklist" value="redirecionamento"><span>Redirecionamento</span></label>
+                            <label class="radio-item"><input type="radio" name="tipoChecklist" value="devolucao"><span>Devolução</span></label>
+                            <label class="radio-item"><input type="radio" name="tipoChecklist" value="rotina"><span>Rotina</span></label>
+                        </div>
+                    </section>
+                    
+                    <section class="section">
+                        <h2 class="section-title"><i class="fas fa-car"></i> Informações do Veículo</h2>
+                        <div class="form-row">
+                            <div class="form-group"><label for="placa">Placa:</label><input type="text" id="placa" name="placa" required></div>
+                            <div class="form-group"><label for="modelo">Modelo:</label><input type="text" id="modelo" name="modelo" required></div>
+                            <div class="form-group"><label for="condutor">Condutor:</label><input type="text" id="condutor" name="condutor" required></div>
+                            <div class="form-group"><label for="cc">C.C.:</label><input type="text" id="cc" name="cc"></div>
+                            <div class="form-group"><label for="localidade">Localidade:</label><input type="text" id="localidade" name="localidade" required></div>
+                            <div class="form-group"><label for="km">KM:</label><input type="number" id="km" name="km" required></div>
+                            <div class="form-group"><label for="telefone">Telefone:</label><input type="tel" id="telefone" name="telefone"></div>
+                            <div class="form-group"><label for="locadora">Locadora:</label><input type="text" id="locadora" name="locadora" value="LOCALIZA FLEET"></div>
+                            <div class="form-group">
+                                <label for="combustivel">Combustível:</label>
+                                <select id="combustivel" name="combustivel" required>
+                                    <option value="">Selecione</option>
+                                    <option value="vazio">Vazio</option><option value="1/4">1/4</option><option value="1/2">1/2</option><option value="3/4">3/4</option><option value="cheio">Cheio</option>
+                                </select>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="section">
+                        <h2 class="section-title"><i class="fas fa-tools"></i> Acessórios</h2>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="bagageiro"><span>Bagageiro</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="antena"><span>Antena</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="triangulo"><span>Triângulo</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="macaco"><span>Macaco</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="chave_roda"><span>Chave de Roda</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="farois_auxiliares"><span>Faróis Auxiliares</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="extintor"><span>Extintor</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="tapetes"><span>Tapetes</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="lacre_placa"><span>Lacre Placa</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="ar_condicionado"><span>Ar Condicionado</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="ventilador"><span>Ventilador</span></label>
+                            <label class="checkbox-item"><input type="checkbox" name="acessorios" value="radio"><span>Rádio</span></label>
+                        </div>
+                    </section>
+                    
+                    <section class="section">
+                        <h2 class="section-title"><i class="fas fa-search"></i> Inspeção Visual do Veículo</h2>
+                        <p class="legend-description"><strong>Legenda:</strong> N = Arranhado | O = Amassado | X = Quebrado</p>
+                        <div id="vehicleContainer" class="vehicle-container">
+                            <div id="vehicleUpload" class="vehicle-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Clique para fazer upload da imagem do veículo</p>
+                                <small>Formatos aceitos: PNG, JPG, JPEG</small>
+                                <input type="file" id="vehicleImageInput" accept="image/*" style="display: none;">
+                            </div>
+                            <div class="damage-legend">
+                                <div class="legend-item active" data-type="scratch"><div class="legend-color scratch"></div><span>Arranhado (N)</span></div>
+                                <div class="legend-item" data-type="dent"><div class="legend-color dent"></div><span>Amassado (O)</span></div>
+                                <div class="legend-item" data-type="broken"><div class="legend-color broken"></div><span>Quebrado (X)</span></div>
+                            </div>
+                            <div class="damage-list" id="damageList"></div>
+                        </div>
+                    </section>
+
+                    <section class="section">
+                        <h2 class="section-title"><i class="fas fa-cogs"></i> Sistemas do Veículo (Irregularidades)</h2>
+                        <div class="form-row">
+                            <div>
+                                <h4>Sistema Elétrico</h4>
+                                <div class="checkbox-group vertical">
+                                    <label class="checkbox-item"><input type="checkbox" name="sistema_eletrico" value="painel"><span>Painel</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="sistema_eletrico" value="buzina"><span>Buzina</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="sistema_eletrico" value="luzes_internas"><span>Luzes Internas</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="sistema_eletrico" value="farol"><span>Farol</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="sistema_eletrico" value="limpador_parabrisa"><span>Limpador</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="sistema_eletrico" value="setas"><span>Setas</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="sistema_eletrico" value="velocimetro"><span>Velocímetro</span></label>
+                                </div>
+                            </div>
+                            <div>
+                                <h4>Freios</h4>
+                                <div class="checkbox-group vertical">
+                                    <label class="checkbox-item"><input type="checkbox" name="freios" value="puxando"><span>Puxando</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="freios" value="trepidando"><span>Trepidando</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="freios" value="nao_segura"><span>Não Segura</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="freios" value="batendo"><span>Batendo</span></label>
+                                </div>
+                            </div>
+                            <div>
+                                <h4>Motor/Refrigeração</h4>
+                                <div class="checkbox-group vertical">
+                                    <label class="checkbox-item"><input type="checkbox" name="motor" value="falha_partida"><span>Falha na Partida</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="motor" value="sem_forca"><span>Sem Força</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="motor" value="oleo_baixo"><span>Óleo Baixo</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="motor" value="vazando"><span>Vazando Água/Óleo</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="motor" value="aquecendo"><span>Aquecendo</span></label>
+                                </div>
+                            </div>
+                            <div>
+                                <h4>Eixo/Suspensão</h4>
+                                <div class="checkbox-group vertical">
+                                    <label class="checkbox-item"><input type="checkbox" name="eixo_suspensao" value="puxando"><span>Puxando</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="eixo_suspensao" value="trepidando"><span>Trepidando</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="eixo_suspensao" value="batendo"><span>Batendo</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="eixo_suspensao" value="com_folga"><span>Com Folga</span></label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="section">
+                        <div class="form-row">
+                            <div>
+                                <h2 class="section-title" style="font-size: 1.1rem;"><i class="fas fa-file-alt"></i> Documentação</h2>
+                                <div class="checkbox-group vertical">
+                                    <label class="checkbox-item"><input type="checkbox" name="documentacao" value="vencido"><span>Vencido</span></label>
+                                    <label class="checkbox-item"><input type="checkbox" name="documentacao" value="faltando"><span>Faltando</span></label>
+                                </div>
+                            </div>
+                            <div>
+                                <h2 class="section-title" style="font-size: 1.1rem;"><i class="fas fa-circle"></i> Pneus</h2>
+                                <div class="form-row">
+                                    <div>
+                                        <h4>Dianteiros</h4>
+                                        <div class="radio-group vertical">
+                                            <label class="radio-item"><input type="radio" name="pneus_dianteiros" value="Bom"><span>Bom</span></label>
+                                            <label class="radio-item"><input type="radio" name="pneus_dianteiros" value="Médio"><span>Médio</span></label>
+                                            <label class="radio-item"><input type="radio" name="pneus_dianteiros" value="Ruim"><span>Ruim</span></label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>Traseiros</h4>
+                                        <div class="radio-group vertical">
+                                            <label class="radio-item"><input type="radio" name="pneus_traseiros" value="Bom"><span>Bom</span></label>
+                                            <label class="radio-item"><input type="radio" name="pneus_traseiros" value="Médio"><span>Médio</span></label>
+                                            <label class="radio-item"><input type="radio" name="pneus_traseiros" value="Ruim"><span>Ruim</span></label>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h4>Estepe</h4>
+                                        <div class="radio-group vertical">
+                                            <label class="radio-item"><input type="radio" name="estepe" value="Bom"><span>Bom</span></label>
+                                            <label class="radio-item"><input type="radio" name="estepe" value="Médio"><span>Médio</span></label>
+                                            <label class="radio-item"><input type="radio" name="estepe" value="Ruim"><span>Ruim</span></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="section">
+                        <div class="form-row">
+                            <div>
+                                <h2 class="section-title" style="font-size: 1.1rem;"><i class="fas fa-exchange-alt"></i> Transferência</h2>
+                                <div class="form-group"><label for="entregue_por">Entregue por:</label><input type="text" id="entregue_por" name="entregue_por"></div>
+                                <div class="form-group"><label for="recebido_por">Recebido por:</label><input type="text" id="recebido_por" name="recebido_por"></div>
+                            </div>
+                            <div>
+                                <h2 class="section-title" style="font-size: 1.1rem;"><i class="fas fa-sticky-note"></i> Anotações</h2>
+                                <div class="form-group"><textarea id="anotacoes" name="anotacoes" rows="5" placeholder="Observações adicionais..."></textarea></div>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <section class="section">
+                        <h2 class="section-title"><i class="fas fa-signature"></i> Assinatura do Condutor</h2>
+                        <div class="signature-pad-container">
+                            <canvas id="signaturePad"></canvas>
+                        </div>
+                        <button type="button" id="clearSignatureBtn" class="btn btn-sm btn-secondary">Limpar Assinatura</button>
+                    </section>
+
+                    <div class="action-buttons">
+                        <button type="button" id="generatePdfBtn" class="btn btn-success"><i class="fas fa-file-pdf"></i> Gerar Relatório PDF</button>
+                        <button type="button" id="saveDraftBtn" class="btn btn-primary"><i class="fas fa-save"></i> Salvar Rascunho</button>
+                        <button type="button" id="loadDraftBtn" class="btn btn-info"><i class="fas fa-folder-open"></i> Carregar Rascunho</button>
+                        <button type="button" id="clearFormBtn" class="btn btn-danger"><i class="fas fa-eraser"></i> Limpar Formulário</button>
+                    </div>
+                </form>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>Gerando relatório PDF...</p>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div id="modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <h3 id="modalTitle"></h3>
+            <div id="modalBody"></div>
+            <div id="modalFooter" class="modal-footer"></div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://unpkg.com/imask"></script>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
