@@ -40,28 +40,25 @@ document.addEventListener('DOMContentLoaded', () => {
             this.state.signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
             resizeCanvas();
         },
-
-        // ==================================================================
-        // INÍCIO DA CORREÇÃO
-        // ==================================================================
+        
         initIMask() {
-            // A máscara da placa foi REMOVIDA para garantir a edição livre do campo.
-            
             // A máscara do telefone continua, pois é útil e não apresenta problemas.
             IMask(document.getElementById('telefone'), { 
                 mask: '(00) 00000-0000',
                 lazy: true 
             });
         },
-        // ==================================================================
-        // FIM DA CORREÇÃO
-        // ==================================================================
 
         bindEvents() {
             document.getElementById('loginForm').addEventListener('submit', this.handleLogin.bind(this));
             document.getElementById('checklistForm').addEventListener('submit', (e) => e.preventDefault());
             document.getElementById('logoutBtn').addEventListener('click', this.handleLogout.bind(this));
-            document.getElementById('generatePdfBtn').addEventListener('click', () => PDF.generate(this.getChecklistData()));
+            
+            // O botão agora se chama "Salvar Checklist" e tem uma nova função
+            const saveBtn = document.getElementById('generatePdfBtn');
+            saveBtn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Salvar Checklist no Drive';
+            saveBtn.addEventListener('click', () => PDF.generateAndUpload(this.getChecklistData()));
+            
             document.getElementById('clearFormBtn').addEventListener('click', this.handleClearForm.bind(this));
             document.getElementById('saveDraftBtn').addEventListener('click', this.handleSaveDraft.bind(this));
             document.getElementById('loadDraftBtn').addEventListener('click', this.handleLoadDraft.bind(this));
@@ -175,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const form = document.getElementById('checklistForm');
             const formData = new FormData(form);
             const data = {};
-            
             const keys = new Set(Array.from(formData.keys()));
 
             for (const key of keys) {
@@ -368,8 +364,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const PDF = {
-        generate: async function(data) {
-            UI.showToast('Iniciando geração do PDF...', 'info');
+        generateAndUpload: async function(data) {
+            // Verifica se o tipo de checklist foi selecionado
+            if (!data.tipoChecklist) {
+                UI.showToast("Por favor, selecione um 'Tipo de Checklist' antes de salvar.", 'error');
+                return;
+            }
+
+            UI.showToast('Gerando PDF, por favor aguarde...', 'info');
             try {
                 const { jsPDF } = window.jspdf;
                 const doc = new jsPDF('p', 'mm', 'a4');
@@ -391,7 +393,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     doc.setTextColor(150);
                     doc.text(`Página ${pageNum} de ${totalPages}`, pageWidth / 2, doc.internal.pageSize.getHeight() - 10, { align: 'center' });
                 };
-
+                
                 const addSectionTitle = (startY, title) => {
                     if (startY > 250) { doc.addPage(); return 30; }
                     doc.setFillColor(220, 220, 220);
@@ -438,7 +440,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     doc.text(value || 'Não preenchido', startX + 2, startY + 5);
                     return startY + 10;
                 };
-
+                
                 y = 30;
                 y = addSectionTitle(y, 'Informações Gerais');
                 addKeyValue(y, 'Data:', new Date().toLocaleString('pt-BR'));
@@ -453,7 +455,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 addKeyValue(y, 'KM:', data.km);
                 addKeyValue(y, 'Combustível:', data.combustivel, 100);
                 y += 10;
-
+                
                 y = addSectionTitle(y, 'Itens do Checklist');
                 const col1X = margin;
                 const col2X = margin + 65;
@@ -536,16 +538,52 @@ document.addEventListener('DOMContentLoaded', () => {
                     doc.setPage(i);
                     addMasterPageElements(doc, i, totalPages);
                 }
+                
+                UI.showToast('Enviando para o Google Drive...', 'info');
+                
+                const pdfBase64 = doc.output('datauristring').split(',')[1];
+                
+                const now = new Date();
+                const ano = now.getFullYear().toString();
+                const mesNumero = (now.getMonth() + 1).toString().padStart(2, '0');
+                const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+                const mesNome = meses[now.getMonth()];
 
-                const fileName = `Checklist_${data.placa || 'Veiculo'}_${new Date().toISOString().split('T')[0]}.pdf`;
-                doc.save(fileName);
-                UI.showToast('PDF gerado com sucesso!', 'success');
+                // Capitaliza a primeira letra do tipo de checklist
+                const tipoCapitalized = data.tipoChecklist.charAt(0).toUpperCase() + data.tipoChecklist.slice(1);
+
+                const payload = {
+                    pdfData: pdfBase64,
+                    fileName: `${data.placa || 'Veiculo'}_${tipoCapitalized}_${now.toISOString()}.pdf`,
+                    tipoChecklist: tipoCapitalized,
+                    ano: ano,
+                    mes: `${mesNumero} - ${mesNome}`
+                };
+
+                const webAppUrl = "https://script.google.com/macros/s/AKfycbz8zjoPo9Ytk1MaLx2bzwsrEoaeViL3qp_lcrnWN_6kD6DudrAt_wT6Mwhr6I9u3myM/exec"; 
+                
+                const response = await fetch(webAppUrl, {
+                    method: 'POST',
+                    mode: 'cors',
+                    cache: 'no-cache',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+
+                if (result.status === "success") {
+                    UI.showToast('Checklist salvo no Google Drive com sucesso!', 'success');
+                } else {
+                    throw new Error(result.message);
+                }
+
             } catch (error) {
-                console.error('Erro ao gerar PDF:', error);
-                UI.showToast('Ocorreu um erro ao gerar o PDF.', 'error');
+                console.error('Erro ao gerar ou salvar PDF:', error);
+                UI.showToast(`Erro: ${error.message}`, 'error');
             }
         },
     };
-
+    
     App.init();
 });
