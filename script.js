@@ -34,17 +34,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 canvas.width = canvas.offsetWidth * ratio;
                 canvas.height = canvas.offsetHeight * ratio;
                 canvas.getContext("2d").scale(ratio, ratio);
-                App.state.signaturePad.clear(); // Limpa ao redimensionar
+                App.state.signaturePad.clear();
             }
             window.addEventListener("resize", resizeCanvas);
             this.state.signaturePad = new SignaturePad(canvas, { backgroundColor: 'rgb(255, 255, 255)' });
             resizeCanvas();
         },
 
+        // ==================================================================
+        // INÍCIO DA CORREÇÃO
+        // ==================================================================
         initIMask() {
-            IMask(document.getElementById('placa'), { mask: 'AAA-0[A]00' });
-            IMask(document.getElementById('telefone'), { mask: '(00) 00000-0000' });
+            // A máscara da placa foi REMOVIDA para garantir a edição livre do campo.
+            
+            // A máscara do telefone continua, pois é útil e não apresenta problemas.
+            IMask(document.getElementById('telefone'), { 
+                mask: '(00) 00000-0000',
+                lazy: true 
+            });
         },
+        // ==================================================================
+        // FIM DA CORREÇÃO
+        // ==================================================================
 
         bindEvents() {
             document.getElementById('loginForm').addEventListener('submit', this.handleLogin.bind(this));
@@ -160,29 +171,18 @@ document.addEventListener('DOMContentLoaded', () => {
             UI.renderDamage(this.state.damageMarkers, this.handleRemoveDamage.bind(this));
         },
         
-        // ==================================================================
-        // INÍCIO DA CORREÇÃO
-        // ==================================================================
         getChecklistData() {
             const form = document.getElementById('checklistForm');
             const formData = new FormData(form);
             const data = {};
             
-            // Usamos um Set para obter os nomes (keys) únicos dos campos do formulário
             const keys = new Set(Array.from(formData.keys()));
 
             for (const key of keys) {
-                // Para cada nome de campo, usamos o método .getAll() que retorna
-                // um array com todos os valores daquele campo.
-                // Isso captura corretamente múltiplos checkboxes selecionados.
                 const values = formData.getAll(key);
-                
-                // Se o array tiver mais de um item, guardamos o array.
-                // Se tiver apenas um (como um campo de texto ou radio), guardamos apenas o valor.
                 data[key] = values.length > 1 ? values : values[0];
             }
             
-            // Adiciona dados do 'state' que não estão no formulário
             data.observador = this.state.currentUser.observador;
             data.supervisor = this.state.currentUser.supervisor;
             data.damageMarkers = this.state.damageMarkers;
@@ -191,9 +191,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             return data;
         },
-        // ==================================================================
-        // FIM DA CORREÇÃO
-        // ==================================================================
 
         loadChecklistData(data) {
             document.getElementById('checklistForm').reset();
@@ -527,10 +524,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 doc.text(splitNotes, margin, y);
 
                 if (data.signatureBase64) {
-                    doc.addImage(data.signatureBase64, 'PNG', pageWidth - margin - 80, ySignature, 80, 40);
+                    const signatureY = ySignature > 220 ? 220 : ySignature;
+                    doc.addImage(data.signatureBase64, 'PNG', pageWidth - margin - 80, signatureY, 80, 40);
                     doc.setDrawColor(0,0,0);
-                    doc.line(pageWidth - margin - 80, ySignature + 42, pageWidth - margin, ySignature + 42);
-                    doc.text('Assinatura do Condutor', pageWidth - margin - 40, ySignature + 46, {align: 'center'});
+                    doc.line(pageWidth - margin - 80, signatureY + 42, pageWidth - margin, signatureY + 42);
+                    doc.text('Assinatura do Condutor', pageWidth - margin - 40, signatureY + 46, {align: 'center'});
                 }
 
                 const totalPages = doc.internal.getNumberOfPages();
